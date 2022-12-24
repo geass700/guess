@@ -1,51 +1,69 @@
+// ignore_for_file: avoid_print
 import 'dart:io';
-import 'dart:math';
+
+import 'Game.dart';
 
 void main() {
-  var r = Random();
-  var answer = r.nextInt(100) + 1;
 
-  var isCorrect = false;
-  var guess_count = 0;
-print("╔══════════════════════════════════════════════");
-print('║                GUESS NUMBER');
-print('╟──────────────────────────────────────────────');
+  var playAgain;
   do {
-    stdout.write('║ Guess the number between 1 and 100 : ');
-    var input = stdin.readLineSync();
-    if (input == 'end'){
-      break;
-    }
-    if (input == null) {
-      continue;
-    }
+    var game = Game();
+    late GuessResult guessResult;
+    print('╔══════════════════════════════════════════════════');
+    print('║              GUESS THE NUMBER              ');
+    print('║──────────────────────────────────────────────────');
+    do {
+      stdout.write('║  Guess the number between 1 and 10 : ');
 
-    var guess = int.tryParse(input);
+      var input = stdin.readLineSync();
 
-    if (guess == null) {
-      continue;
-    }
+      if (input == null) {
+        //print('Error, input is NULL');
+        return;
+      }
 
-    if (guess == answer) {
-      print('║ ' + input + 'CORRECT! The answer is $answer');
-      guess_count+=1;
-      isCorrect = true;
-      print('╟──────────────────────────────────────────────');
-    } else if (guess > answer) {
-      print('║ '+input + ' is TOO HIGH ▲');
-      guess_count+=1;
-      isCorrect = false;
-      print('╟──────────────────────────────────────────────');
-    } else {
-      print('║ '+input +' is TOO LOW ▼');
-      guess_count+=1;
-      isCorrect = false;
-      print('╟──────────────────────────────────────────────');
-    }
+      var guess = int.tryParse(input);
 
-  } while (!isCorrect);
+      if (guess == null) {
+        //print('Input error, please enter numbers only');
+        continue;
+      }
 
-  print("║                total guess : $guess_count");
-  print('╚══════════════════════════════════════════════');
+      guessResult = game.doGuess(guess);
+
+      if (guessResult == GuessResult.correct) {
+        print('║  ➜ $guess is CORRECT ❤, total guesses: ${game.totalGuesses}');
+        print('║──────────────────────────────────────────────────');
+        print('║                    THE END                       ');
+        print('╚══════════════════════════════════════════════════');
+
+        while (true) {
+          print('Play again? (Y/N) :');
+          var again = stdin.readLineSync();
+          if (again == 'Y' || again == 'y') {
+            playAgain = true;
+            break;
+          } else if (again == 'N' || again == 'n') {
+            playAgain = false;
+            break;
+          }
+        }
+      } else if (guessResult == GuessResult.tooHigh) {
+        print('║  ➜ $guess is TOO HIGH! ▲');
+        print('║──────────────────────────────────────────────────');
+      } else {
+        print('║  ➜ $guess is TOO LOW! ▼');
+        print('║──────────────────────────────────────────────────');
+      }
+    } while (guessResult != GuessResult.correct);
+
+  }
+  while (playAgain == true);
+  int num_of_played = Game.totalguessList.length;
+  print("You're play $num_of_played game");
+  for(int i =0;i < num_of_played ; i++){
+    int r = i+1;
+    print('🚀 game# $r : ${Game.totalguessList[i]} guesses' );
+  }
 
 }
